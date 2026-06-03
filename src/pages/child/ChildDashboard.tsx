@@ -40,7 +40,7 @@ export const ChildDashboard: React.FC = () => {
         <button onClick={() => { switchToParent(); navigate('/parent'); }} className="flex items-center gap-1 text-sm text-gray-500 font-medium">
           <ChevronLeft className="w-4 h-4" /> Parents
         </button>
-        <div className="text-xs text-gray-400 font-medium">FamilyVault</div>
+        <div className="text-xs text-gray-400 font-medium">TiPoche</div>
       </div>
 
       {/* Hero section */}

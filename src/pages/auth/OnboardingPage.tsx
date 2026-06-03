@@ -156,12 +156,22 @@ export const OnboardingPage: React.FC = () => {
               </div>
 
               {children.length < 4 && (
-                <button
-                  onClick={addChild}
-                  className="w-full py-2.5 border-2 border-dashed border-gray-200 text-gray-500 rounded-2xl text-sm font-medium hover:border-purple-300 hover:text-purple-500 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Plus className="w-4 h-4" /> Ajouter un enfant
-                </button>
+                children.length >= 1 ? (
+                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 flex items-center gap-3">
+                    <span className="text-2xl">⭐</span>
+                    <div>
+                      <p className="text-sm font-semibold text-amber-800">Plusieurs enfants = Premium</p>
+                      <p className="text-xs text-amber-600">Passez à TiPoche Premium pour ajouter jusqu'à 4 enfants</p>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={addChild}
+                    className="w-full py-2.5 border-2 border-dashed border-gray-200 text-gray-500 rounded-2xl text-sm font-medium hover:border-purple-300 hover:text-purple-500 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" /> Ajouter un enfant
+                  </button>
+                )
               )}
 
               <div className="flex gap-3">
@@ -197,7 +207,7 @@ export const OnboardingPage: React.FC = () => {
               <div className="bg-amber-50 rounded-2xl p-3 text-left">
                 <div className="text-sm font-semibold text-amber-800 mb-1">📱 Comment ça marche ?</div>
                 <div className="text-xs text-amber-700 space-y-1">
-                  <div>1. L'enfant ouvre FamilyVault</div>
+                  <div>1. L'enfant ouvre TiPoche</div>
                   <div>2. Il saisit le code famille : <strong>{inviteCode}</strong></div>
                   <div>3. Il crée son profil avec son PIN</div>
                 </div>

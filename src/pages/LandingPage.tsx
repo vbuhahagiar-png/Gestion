@@ -26,10 +26,10 @@ const testimonials = [
 ];
 
 const faqs = [
-  { q: 'Est-ce gratuit ?', a: 'Oui ! Le plan gratuit inclut 1 famille, 5 tâches actives et les badges basiques. Le plan Premium (CHF 7.90/mois) débloque les fonctionnalités avancées.' },
+  { q: 'Est-ce gratuit ?', a: 'Oui ! Le plan gratuit inclut 1 enfant, 5 tâches actives et les badges basiques. Le plan Premium (CHF 4.90/mois) débloque les fonctionnalités avancées.' },
   { q: 'Comment les enfants reçoivent leur argent ?', a: 'L\'app gère la cagnotte virtuelle. Quand l\'enfant demande un retrait, vous le validez dans l\'app et vous donnez l\'argent en Twint ou en espèces.' },
-  { q: 'Puis-je avoir plusieurs enfants ?', a: 'Oui ! Jusqu\'à 4 enfants avec le plan gratuit. Chaque enfant a son propre profil, cagnotte et progression.' },
-  { q: 'L\'app fonctionne sur mobile ?', a: 'Absolument ! FamilyVault est conçu mobile-first. Il fonctionne sur tous les smartphones et peut être installé comme une app native.' },
+  { q: 'Puis-je avoir plusieurs enfants ?', a: 'Oui ! Jusqu\'à 4 enfants avec le plan Premium. Chaque enfant a son propre profil, cagnotte et progression.' },
+  { q: 'L\'app fonctionne sur mobile ?', a: 'Absolument ! TiPoche est conçu mobile-first. Il fonctionne sur tous les smartphones et peut être installé comme une app native.' },
   { q: 'Mes données sont-elles sécurisées ?', a: 'Toutes les données sont stockées localement sur votre appareil. Nous ne partageons rien avec des tiers.' },
 ];
 
@@ -47,7 +47,7 @@ export const LandingPage: React.FC = () => {
             <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-700 rounded-xl flex items-center justify-center text-white">
               <Vault className="w-4 h-4" />
             </div>
-            <span className="font-black text-lg text-gray-900">FamilyVault</span>
+            <span className="font-black text-lg text-gray-900">TiPoche</span>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>Connexion</Button>
@@ -174,7 +174,7 @@ export const LandingPage: React.FC = () => {
               <div className="text-3xl font-black text-gray-900 my-2">CHF 0</div>
               <p className="text-gray-500 text-sm mb-4">Pour commencer sans engagement</p>
               <div className="space-y-2 mb-5">
-                {['1 famille, jusqu\'à 4 enfants', '5 tâches actives', 'Badges basiques', 'Tirelire virtuelle CHF', 'Calendrier familial', 'Liste de courses'].map((f, i) => (
+                {['1 famille, 1 enfant', '5 tâches actives', 'Badges basiques', 'Tirelire virtuelle CHF', 'Calendrier familial', 'Liste de courses'].map((f, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm text-gray-600">
                     <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
                     {f}
@@ -190,10 +190,10 @@ export const LandingPage: React.FC = () => {
               <div className="text-3xl mb-1">👑</div>
               <h3 className="text-xl font-black text-white">Family Premium</h3>
               <div className="flex items-baseline gap-1 my-2">
-                <span className="text-3xl font-black text-white">CHF 7.90</span>
+                <span className="text-3xl font-black text-white">CHF 4.90</span>
                 <span className="text-purple-200">/mois</span>
               </div>
-              <p className="text-purple-200 text-sm mb-1">ou CHF 79/an <span className="bg-white/20 px-1.5 rounded text-white font-bold">-15%</span></p>
+              <p className="text-purple-200 text-sm mb-1">ou CHF 49/an <span className="bg-white/20 px-1.5 rounded text-white font-bold">-17%</span></p>
               <div className="space-y-2 mb-5 mt-4">
                 {['Tout du plan Gratuit +', 'Tâches illimitées', 'Badges premium exclusifs', 'Statistiques avancées', 'Thèmes personnalisés', 'Streak freeze 1x/semaine', 'Support prioritaire'].map((f, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm text-white">
@@ -262,7 +262,7 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-xl mx-auto">
           <div className="text-5xl mb-4">🚀</div>
           <h2 className="text-3xl font-black mb-4">Prêt à transformer votre famille ?</h2>
-          <p className="text-purple-200 mb-8">Rejoignez les familles suisses qui utilisent FamilyVault chaque jour.</p>
+          <p className="text-purple-200 mb-8">Rejoignez les familles suisses qui utilisent TiPoche chaque jour.</p>
           <Button
             variant="secondary"
             size="lg"
@@ -280,9 +280,9 @@ export const LandingPage: React.FC = () => {
           <div className="w-7 h-7 bg-gradient-to-br from-violet-500 to-purple-700 rounded-xl flex items-center justify-center text-white">
             <Vault className="w-4 h-4" />
           </div>
-          <span className="font-black text-white">FamilyVault</span>
+          <span className="font-black text-white">TiPoche</span>
         </div>
-        <p className="text-sm">© 2025 FamilyVault · Fait avec ❤️ en Suisse 🇨🇭</p>
+        <p className="text-sm">© 2025 TiPoche · Fait avec ❤️ en Suisse 🇨🇭</p>
         <p className="text-xs mt-1">Données stockées localement · Confidentialité garantie</p>
       </footer>
 

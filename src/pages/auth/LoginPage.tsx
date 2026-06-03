@@ -40,8 +40,8 @@ export const LoginPage: React.FC = () => {
           <div className="w-14 h-14 bg-gradient-to-br from-violet-500 to-purple-700 rounded-2xl flex items-center justify-center mb-3 shadow-lg shadow-purple-200">
             <Vault className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-black text-gray-900">FamilyVault</h1>
-          <p className="text-gray-500 text-sm mt-1">Connectez-vous à votre famille</p>
+          <h1 className="text-2xl font-black text-gray-900">TiPoche</h1>
+          <p className="text-gray-500 text-sm mt-1">Les tâches qui rapportent</p>
         </div>
 
         {/* Demo button */}
@@ -50,7 +50,7 @@ export const LoginPage: React.FC = () => {
           onClick={fillDemo}
           className="w-full mb-5 py-2.5 border-2 border-dashed border-purple-300 text-purple-600 rounded-2xl text-sm font-semibold hover:bg-purple-50 transition-colors"
         >
-          🎮 Connexion démo (demo@familyvault.ch)
+          🎮 Connexion démo (demo@tipoche.ch)
         </button>
 
         <div className="flex items-center gap-3 mb-5">

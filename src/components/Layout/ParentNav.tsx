@@ -29,7 +29,7 @@ export const ParentNav: React.FC = () => {
           <div className="w-9 h-9 bg-gradient-to-br from-violet-500 to-purple-700 rounded-xl flex items-center justify-center text-white">
             <Vault className="w-5 h-5" />
           </div>
-          <span className="font-bold text-xl text-gray-900">FamilyVault</span>
+          <span className="font-bold text-xl text-gray-900">TiPoche</span>
         </div>
 
         <nav className="flex-1 space-y-1">

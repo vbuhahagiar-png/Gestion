@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '../UI/Modal';
 import { Button } from '../UI/Button';
-import { Check, Zap, Star } from 'lucide-react';
 import { redirectToCheckout } from '../../lib/stripe';
 
 interface PricingModalProps {
@@ -26,43 +25,45 @@ export const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) =
             onClick={() => setBilling('monthly')}
             className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all ${billing === 'monthly' ? 'bg-white shadow text-gray-900' : 'text-gray-500'}`}
           >
-            Mensuel<br /><span className="text-xs font-normal">CHF 7.90/mois</span>
+            Mensuel<br /><span className="text-xs font-normal">CHF 4.90/mois</span>
           </button>
           <button
             onClick={() => setBilling('yearly')}
             className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all ${billing === 'yearly' ? 'bg-white shadow text-gray-900' : 'text-gray-500'}`}
           >
             Annuel<br />
-            <span className="text-xs font-normal text-emerald-600 font-bold">CHF 79/an — Économisez 15% 🎉</span>
+            <span className="text-xs font-normal text-emerald-600 font-bold">CHF 49/an — Économisez 17% 🎉</span>
           </button>
         </div>
 
         {/* Price display */}
         <div className="bg-gradient-to-br from-violet-500 to-purple-700 rounded-3xl p-5 text-white text-center">
           <div className="text-3xl font-black">
-            {billing === 'monthly' ? 'CHF 7.90' : 'CHF 6.58'}
+            {billing === 'monthly' ? 'CHF 4.90' : 'CHF 4.08'}
             <span className="text-lg font-normal opacity-75">/mois</span>
           </div>
           {billing === 'yearly' && (
-            <div className="text-sm opacity-90 mt-1">Facturé CHF 79/an · Économisez CHF 15.80</div>
+            <div className="text-sm opacity-90 mt-1">Facturé CHF 49/an · Économisez CHF 9.80</div>
           )}
         </div>
 
         {/* Features */}
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           {[
-            { icon: Zap, text: 'Tâches illimitées (au lieu de 5)' },
-            { icon: Star, text: 'Badges premium exclusifs' },
-            { icon: Check, text: 'Statistiques avancées & graphiques' },
-            { icon: Check, text: 'Thèmes personnalisés pour les enfants' },
-            { icon: Check, text: 'Streak freeze (1x/semaine)' },
-            { icon: Check, text: 'Export PDF des rapports mensuels' },
-            { icon: Check, text: 'Support prioritaire' },
-          ].map(({ icon: Icon, text }, i) => (
+            '✅ Jusqu\'à 4 enfants (gratuit = 1 enfant)',
+            '⚡ Tâches illimitées (gratuit = 5 tâches)',
+            '🏆 Badges premium exclusifs',
+            '📊 Statistiques avancées et graphiques hebdomadaires',
+            '📅 Synchronisation Google Calendar & Outlook',
+            '🎨 Thèmes personnalisés pour chaque enfant',
+            '🔥 Streak freeze (1x par semaine)',
+            '📩 Rappels automatiques par notification',
+            '💰 Virement automatique d\'argent de poche programmé',
+            '📄 Export PDF du rapport mensuel',
+            '🎯 Missions bonus illimitées',
+            '🌟 Support prioritaire',
+          ].map((text, i) => (
             <div key={i} className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                <Icon className="w-3.5 h-3.5 text-emerald-600" />
-              </div>
               <span className="text-sm text-gray-700">{text}</span>
             </div>
           ))}

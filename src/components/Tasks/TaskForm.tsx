@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '../UI/Button';
 import type { Task, TaskCategory, TaskFrequency, RewardType } from '../../types';
-import { TASK_EMOJIS } from '../../data/taskTemplates';
+import { TASK_EMOJIS, TASK_TEMPLATES } from '../../data/taskTemplates';
 
 interface TaskFormProps {
   familyId: string;
@@ -71,6 +71,37 @@ export const TaskForm: React.FC<TaskFormProps> = ({ familyId, childIds, getChild
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Template picker */}
+      <div>
+        <label className="text-sm font-semibold text-gray-700 block mb-2">
+          Choisir un modèle (modifiable) 📋
+        </label>
+        <div className="flex flex-wrap gap-2 mb-3">
+          {TASK_TEMPLATES.slice(0, 12).map(t => (
+            <button
+              key={t.title}
+              type="button"
+              onClick={() => {
+                setForm(f => ({
+                  ...f,
+                  title: t.title,
+                  description: t.description,
+                  category: t.category,
+                  emoji: t.emoji,
+                  rewardMoney: String(t.rewardMoney),
+                  rewardXP: String(t.rewardXP),
+                }));
+              }}
+              className="flex flex-col items-center p-2 rounded-xl bg-gray-50 hover:bg-purple-50 hover:ring-2 hover:ring-purple-300 transition-all text-center min-w-[52px]"
+              title={t.title}
+            >
+              <span className="text-xl">{t.emoji}</span>
+              <span className="text-[10px] text-gray-500 mt-0.5 leading-tight max-w-[48px] truncate">{t.title}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Emoji picker */}
       <div>
         <label className="text-sm font-semibold text-gray-700 block mb-2">Emoji</label>

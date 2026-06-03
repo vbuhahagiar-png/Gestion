@@ -29,7 +29,7 @@ export const SignupPage: React.FC = () => {
             <Vault className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-black text-gray-900">Créer un compte</h1>
-          <p className="text-gray-500 text-sm mt-1">Rejoignez FamilyVault gratuitement</p>
+          <p className="text-gray-500 text-sm mt-1">Rejoignez TiPoche gratuitement</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

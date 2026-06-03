@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flame, Trophy } from 'lucide-react';
+import { Flame, Trophy, Lock } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useFamilyStore } from '../../store/useFamilyStore';
 import { Avatar } from '../../components/UI/Avatar';
@@ -9,6 +9,7 @@ import { TransactionList } from '../../components/Wallet/TransactionList';
 import { XPBar } from '../../components/Gamification/XPBar';
 import { BadgeGrid } from '../../components/Gamification/BadgeGrid';
 import { StreakDisplay } from '../../components/Gamification/StreakDisplay';
+import { PricingModal } from '../../components/Premium/PricingModal';
 import { BADGES } from '../../data/badges';
 import type { User } from '../../types';
 
@@ -78,11 +79,14 @@ const ChildDetailModal: React.FC<{ child: User; onClose: () => void }> = ({ chil
 };
 
 export const ChildrenPage: React.FC = () => {
-  const { allUsers } = useAuthStore();
+  const { allUsers, currentFamily } = useAuthStore();
   const { wallets, tasks } = useFamilyStore();
   const [selectedChild, setSelectedChild] = useState<User | null>(null);
+  const [pricingOpen, setPricingOpen] = useState(false);
 
   const children = allUsers.filter(u => u.role === 'child');
+  const isFreePlan = currentFamily?.plan === 'free';
+  const atFreeLimit = isFreePlan && children.length >= 1;
 
   return (
     <div className="space-y-4">
@@ -125,9 +129,20 @@ export const ChildrenPage: React.FC = () => {
         })}
       </div>
 
+      {atFreeLimit ? (
+        <button
+          onClick={() => setPricingOpen(true)}
+          className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-amber-300 text-amber-700 bg-amber-50 rounded-2xl text-sm font-semibold hover:bg-amber-100 transition-colors"
+        >
+          <Lock className="w-4 h-4" /> Ajouter un enfant (Premium)
+        </button>
+      ) : null}
+
       {selectedChild && (
         <ChildDetailModal child={selectedChild} onClose={() => setSelectedChild(null)} />
       )}
+
+      <PricingModal isOpen={pricingOpen} onClose={() => setPricingOpen(false)} />
     </div>
   );
 };

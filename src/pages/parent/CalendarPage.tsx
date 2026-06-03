@@ -6,9 +6,22 @@ import { useFamilyStore } from '../../store/useFamilyStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Modal } from '../../components/UI/Modal';
 import { Button } from '../../components/UI/Button';
+import type { CalendarEvent } from '../../types';
 
 const EVENT_COLORS = ['bg-purple-500', 'bg-blue-500', 'bg-pink-500', 'bg-green-500', 'bg-amber-500', 'bg-red-500'];
 const EMOJI_OPTIONS = ['📅', '⚽', '🏫', '🎂', '🦷', '🎉', '🏊', '💃', '🧺', '🎭', '🏋️', '📚'];
+
+const addToGoogleCalendar = (event: CalendarEvent) => {
+  const start = event.date.replace(/-/g, '').slice(0, 8) + 'T090000';
+  const end = event.date.replace(/-/g, '').slice(0, 8) + 'T100000';
+  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${start}/${end}&details=${encodeURIComponent('Événement TiPoche - ' + event.title)}`;
+  window.open(url, '_blank');
+};
+
+const addToOutlook = (event: CalendarEvent) => {
+  const url = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(event.title)}&startdt=${event.date}T09:00:00&enddt=${event.date}T10:00:00&body=${encodeURIComponent('Événement TiPoche')}`;
+  window.open(url, '_blank');
+};
 
 export const CalendarPage: React.FC = () => {
   const { events, addEvent, deleteEvent } = useFamilyStore();
@@ -49,6 +62,18 @@ export const CalendarPage: React.FC = () => {
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-black text-gray-900">Calendrier</h1>
+
+      {/* Calendar sync buttons */}
+      <div className="flex gap-2">
+        <button onClick={() => window.open('https://calendar.google.com', '_blank')}
+          className="flex items-center gap-2 bg-white border border-gray-200 rounded-2xl px-3 py-2 text-sm font-medium hover:bg-gray-50 transition">
+          <span>📅</span> Google Calendar
+        </button>
+        <button onClick={() => window.open('https://outlook.live.com/calendar', '_blank')}
+          className="flex items-center gap-2 bg-white border border-gray-200 rounded-2xl px-3 py-2 text-sm font-medium hover:bg-gray-50 transition">
+          <span>📆</span> Outlook
+        </button>
+      </div>
 
       {/* Month nav */}
       <div className="flex items-center justify-between">

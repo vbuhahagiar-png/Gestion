@@ -19,7 +19,7 @@ export const PremiumBanner: React.FC<PremiumBannerProps> = ({ plan }) => {
         <Sparkles className="w-6 h-6 text-white shrink-0" />
         <div className="flex-1">
           <div className="font-bold text-white text-sm">Passer à Premium</div>
-          <div className="text-xs text-amber-100">Tâches illimitées, badges exclusifs — CHF 7.90/mois</div>
+          <div className="text-xs text-amber-100">Tâches illimitées, badges exclusifs — CHF 4.90/mois</div>
         </div>
         <button
           onClick={() => setPricingOpen(true)}

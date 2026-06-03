@@ -110,6 +110,28 @@ export const MyWalletPage: React.FC = () => {
           <div className="font-bold text-gray-900 mb-2">Historique</div>
           <TransactionList transactions={myTransactions} />
         </div>
+
+        {/* How to earn more */}
+        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-3xl p-4 mt-4">
+          <h3 className="font-black text-gray-900 mb-3">Comment gagner plus ? 💡</h3>
+          <div className="space-y-2">
+            {[
+              { emoji: '✅', title: 'Terminer des tâches', desc: 'Chaque tâche validée = argent dans ta cagnotte', color: 'bg-green-100 text-green-700' },
+              { emoji: '🔥', title: 'Garder ton streak', desc: 'Fais des tâches chaque jour pour des bonus XP', color: 'bg-orange-100 text-orange-700' },
+              { emoji: '🏆', title: 'Débloquer des badges', desc: 'Certains badges rares donnent un bonus CHF', color: 'bg-purple-100 text-purple-700' },
+              { emoji: '⭐', title: 'Monter de niveau', desc: 'Chaque nouveau niveau = bonus de ta famille', color: 'bg-blue-100 text-blue-700' },
+              { emoji: '🎯', title: 'Missions spéciales', desc: 'Tes parents peuvent créer des tâches bonus exceptionnelles', color: 'bg-pink-100 text-pink-700' },
+            ].map(item => (
+              <div key={item.emoji} className="flex items-center gap-3 bg-white rounded-2xl p-3">
+                <span className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg ${item.color}`}>{item.emoji}</span>
+                <div>
+                  <p className="text-sm font-bold text-gray-800">{item.title}</p>
+                  <p className="text-xs text-gray-500">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {wallet && (
