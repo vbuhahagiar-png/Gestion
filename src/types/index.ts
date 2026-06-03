@@ -112,6 +112,17 @@ export interface BadgeDef {
   isPremium: boolean;
 }
 
+export interface FamilyMessage {
+  id: string;
+  familyId: string;
+  fromId: string;
+  toId: string;
+  text: string;
+  emoji: string;
+  read: boolean;
+  createdAt: string;
+}
+
 export interface Notification {
   id: string;
   userId: string;

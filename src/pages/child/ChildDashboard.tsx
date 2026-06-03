@@ -15,7 +15,7 @@ export const ChildDashboard: React.FC = () => {
   const { childId } = useParams<{ childId: string }>();
   const navigate = useNavigate();
   const { allUsers, switchToParent } = useAuthStore();
-  const { tasks, wallets, withdrawals } = useFamilyStore();
+  const { tasks, wallets, withdrawals, messages, markMessageRead } = useFamilyStore();
 
   const child = allUsers.find(u => u.id === childId);
   const wallet = wallets.find(w => w.childId === childId);
@@ -28,6 +28,7 @@ export const ChildDashboard: React.FC = () => {
 
   const pendingWithdrawals = withdrawals.filter(w => w.childId === childId && w.status === 'pending');
   const recentBadges = BADGES.filter(b => child?.unlockedBadges.includes(b.id)).slice(0, 3);
+  const myMessages = messages.filter(m => m.toId === childId && !m.read);
 
   const { completeTask } = useFS();
 
@@ -74,6 +75,22 @@ export const ChildDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Parent messages */}
+      {myMessages.length > 0 && (
+        <div className="px-4 mb-4 space-y-2">
+          {myMessages.map(msg => (
+            <div key={msg.id} className="bg-gradient-to-r from-pink-500 to-rose-500 rounded-3xl p-4 text-white shadow-lg flex items-center gap-3 animate-bounce-in">
+              <span className="text-3xl">{msg.emoji}</span>
+              <div className="flex-1">
+                <p className="text-xs font-semibold opacity-80 mb-0.5">Message de tes parents 💝</p>
+                <p className="font-bold text-sm">{msg.text}</p>
+              </div>
+              <button onClick={() => markMessageRead(msg.id)} className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center text-lg hover:bg-white/30">✓</button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Streak + Balance row */}
       <div className="px-4 mb-5 grid grid-cols-2 gap-3">

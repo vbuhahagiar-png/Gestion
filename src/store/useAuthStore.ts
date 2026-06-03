@@ -18,7 +18,7 @@ const DEMO_USERS: User[] = [
     role: 'parent',
     familyId: 'family-martin',
     name: 'Sophie Martin',
-    email: 'demo@familyvault.ch',
+    email: 'demo@tipoche.ch',
     avatar: '👩‍💼',
     color: 'from-purple-500 to-indigo-600',
     level: 1,
@@ -168,7 +168,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       login: async (email: string, password: string) => {
-        if (email === 'demo@familyvault.ch' && password === 'demo1234') {
+        if (email === 'demo@tipoche.ch' && password === 'demo1234') {
           const user = DEMO_USERS.find(u => u.email === email);
           if (user) {
             set({

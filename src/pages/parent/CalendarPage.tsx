@@ -154,14 +154,30 @@ export const CalendarPage: React.FC = () => {
           ) : (
             <div className="space-y-2">
               {dayEvents.map(evt => (
-                <div key={evt.id} className="flex items-center gap-3 bg-white rounded-2xl p-3 shadow-sm">
-                  <div className={`w-10 h-10 ${evt.color} rounded-xl flex items-center justify-center text-xl text-white`}>
-                    {evt.emoji}
+                <div key={evt.id} className="bg-white rounded-2xl p-3 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 ${evt.color} rounded-xl flex items-center justify-center text-xl text-white`}>
+                      {evt.emoji}
+                    </div>
+                    <span className="flex-1 font-semibold text-gray-900 text-sm">{evt.title}</span>
+                    <button onClick={() => deleteEvent(evt.id)} className="text-gray-300 hover:text-red-400 transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
-                  <span className="flex-1 font-semibold text-gray-900 text-sm">{evt.title}</span>
-                  <button onClick={() => deleteEvent(evt.id)} className="text-gray-300 hover:text-red-400 transition-colors">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex gap-2 mt-2 ml-13">
+                    <button
+                      onClick={() => addToGoogleCalendar(evt)}
+                      className="flex items-center gap-1 text-xs text-gray-500 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 px-2 py-1 rounded-lg transition-colors"
+                    >
+                      📅 Google
+                    </button>
+                    <button
+                      onClick={() => addToOutlook(evt)}
+                      className="flex items-center gap-1 text-xs text-gray-500 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 px-2 py-1 rounded-lg transition-colors"
+                    >
+                      📆 Outlook
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -178,14 +194,32 @@ export const CalendarPage: React.FC = () => {
             .sort((a, b) => a.date.localeCompare(b.date))
             .slice(0, 5)
             .map(evt => (
-              <div key={evt.id} className="flex items-center gap-3 bg-white rounded-2xl p-3 shadow-sm">
-                <div className={`w-10 h-10 ${evt.color} rounded-xl flex items-center justify-center text-xl text-white`}>
-                  {evt.emoji}
-                </div>
-                <div className="flex-1">
-                  <div className="font-semibold text-gray-900 text-sm">{evt.title}</div>
-                  <div className="text-xs text-gray-400 capitalize">
-                    {format(parseISO(evt.date), 'EEEE d MMMM', { locale: fr })}
+              <div key={evt.id} className="bg-white rounded-2xl p-3 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 ${evt.color} rounded-xl flex items-center justify-center text-xl text-white`}>
+                    {evt.emoji}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-semibold text-gray-900 text-sm">{evt.title}</div>
+                    <div className="text-xs text-gray-400 capitalize">
+                      {format(parseISO(evt.date), 'EEEE d MMMM', { locale: fr })}
+                    </div>
+                  </div>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => addToGoogleCalendar(evt)}
+                      className="text-xs text-gray-400 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 px-2 py-1 rounded-lg transition-colors"
+                      title="Ajouter à Google Calendar"
+                    >
+                      📅
+                    </button>
+                    <button
+                      onClick={() => addToOutlook(evt)}
+                      className="text-xs text-gray-400 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 px-2 py-1 rounded-lg transition-colors"
+                      title="Ajouter à Outlook"
+                    >
+                      📆
+                    </button>
                   </div>
                 </div>
               </div>

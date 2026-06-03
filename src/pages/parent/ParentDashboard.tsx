@@ -50,10 +50,24 @@ const ChildCard: React.FC<{ userId: string }> = ({ userId }) => {
 export const ParentDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser, currentFamily, allUsers } = useAuthStore();
-  const { tasks, withdrawals, addTask, approveTask, rejectTask } = useFamilyStore();
+  const { tasks, withdrawals, addTask, approveTask, rejectTask, sendMessage } = useFamilyStore();
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
   const [newEvent, setNewEvent] = useState({ title: '', date: '', emoji: '📅' });
+  const [confirmWithdrawal, setConfirmWithdrawal] = useState<string | null>(null);
+  const [showMessages, setShowMessages] = useState(false);
+  const [selectedChild, setSelectedChild] = useState<string>('');
+
+  const PRESET_MESSAGES = [
+    { emoji: '🏆', text: 'Bravo champion(ne) ! Je suis super fier(e) de toi !' },
+    { emoji: '⭐', text: 'Tu fais un travail exceptionnel, continue comme ça !' },
+    { emoji: '💪', text: 'Courage ! Tu y es presque, ne lâche pas !' },
+    { emoji: '🌟', text: 'Tu es une étoile ! Toute la famille est fière de toi.' },
+    { emoji: '🎉', text: 'Excellent travail cette semaine ! Tu mérites ta récompense.' },
+    { emoji: '💝', text: 'Je t\'aime fort et je suis fier(e) de toi chaque jour.' },
+    { emoji: '🚀', text: 'Tu progresses à toute vitesse ! Fantastique !' },
+    { emoji: '😊', text: 'Merci pour ton aide à la maison, ça compte beaucoup !' },
+  ];
 
   const { addEvent } = useFamilyStore();
 
@@ -167,7 +181,7 @@ export const ParentDashboard: React.FC = () => {
                     {wr.note && <div className="text-xs text-gray-500 truncate">{wr.note}</div>}
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => useFamilyStore.getState().approveWithdrawal(wr.id)} className="w-9 h-9 bg-emerald-500 text-white rounded-xl flex items-center justify-center hover:bg-emerald-600 transition-colors">✓</button>
+                    <button onClick={() => setConfirmWithdrawal(wr.id)} className="w-9 h-9 bg-emerald-500 text-white rounded-xl flex items-center justify-center hover:bg-emerald-600 transition-colors">✓</button>
                     <button onClick={() => useFamilyStore.getState().rejectWithdrawal(wr.id)} className="w-9 h-9 bg-red-100 text-red-500 rounded-xl flex items-center justify-center hover:bg-red-200 transition-colors">✗</button>
                   </div>
                 </div>
@@ -223,8 +237,91 @@ export const ParentDashboard: React.FC = () => {
           <Button variant="secondary" onClick={() => setShowEventForm(true)} className="flex items-center gap-2">
             <CalendarPlus className="w-4 h-4" /> Événement
           </Button>
+          <button
+            onClick={() => setShowMessages(true)}
+            className="col-span-2 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold py-3 rounded-2xl hover:opacity-90 transition-opacity"
+          >
+            💬 Envoyer un message d'encouragement
+          </button>
         </div>
       </div>
+
+      {/* Withdrawal confirmation modal */}
+      <Modal isOpen={!!confirmWithdrawal} onClose={() => setConfirmWithdrawal(null)} title="Confirmer le retrait 💸" size="sm">
+        {confirmWithdrawal && (() => {
+          const wr = withdrawals.find(w => w.id === confirmWithdrawal);
+          const child = allUsers.find(u => u.id === wr?.childId);
+          return (
+            <div className="space-y-4">
+              <div className="bg-blue-50 rounded-2xl p-4 text-center">
+                <div className="text-3xl mb-2">{child?.avatar}</div>
+                <p className="font-bold text-gray-900">{child?.name} demande <span className="text-emerald-600">CHF {wr?.amount.toFixed(2)}</span></p>
+                {wr?.note && <p className="text-sm text-gray-500 mt-1">"{wr.note}"</p>}
+              </div>
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+                <p className="font-bold text-amber-800 mb-2">📱 Avant de valider :</p>
+                <p className="text-sm text-amber-700">Remettez <strong>CHF {wr?.amount.toFixed(2)}</strong> à {child?.name} via :</p>
+                <div className="mt-2 space-y-1">
+                  <div className="text-sm text-amber-700">• <strong>Twint</strong> — rapide et gratuit</div>
+                  <div className="text-sm text-amber-700">• <strong>Virement bancaire</strong></div>
+                  <div className="text-sm text-amber-700">• <strong>Espèces</strong> — en main propre</div>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Button variant="secondary" fullWidth onClick={() => setConfirmWithdrawal(null)}>Pas encore</Button>
+                <Button variant="success" fullWidth onClick={() => {
+                  useFamilyStore.getState().approveWithdrawal(confirmWithdrawal);
+                  setConfirmWithdrawal(null);
+                }}>
+                  J'ai payé ✓
+                </Button>
+              </div>
+            </div>
+          );
+        })()}
+      </Modal>
+
+      {/* Messages modal */}
+      <Modal isOpen={showMessages} onClose={() => setShowMessages(false)} title="💬 Message d'encouragement" size="md">
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-semibold text-gray-700 block mb-2">Pour quel enfant ?</label>
+            <div className="flex gap-2 flex-wrap">
+              {children.map(c => (
+                <button
+                  key={c.id}
+                  onClick={() => setSelectedChild(c.id)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-2xl text-sm font-semibold transition-all ${selectedChild === c.id ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                >
+                  {c.avatar} {c.name}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="text-sm font-semibold text-gray-700 block mb-2">Choisir un message</label>
+            <div className="grid grid-cols-1 gap-2 max-h-72 overflow-y-auto">
+              {PRESET_MESSAGES.map((msg, i) => (
+                <button
+                  key={i}
+                  disabled={!selectedChild}
+                  onClick={() => {
+                    if (!selectedChild || !currentUser || !currentFamily) return;
+                    sendMessage(currentUser.id, selectedChild, currentFamily.id, msg.text, msg.emoji);
+                    setShowMessages(false);
+                    setSelectedChild('');
+                  }}
+                  className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50 hover:bg-purple-50 hover:ring-2 hover:ring-purple-200 transition-all text-left disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <span className="text-2xl">{msg.emoji}</span>
+                  <span className="text-sm text-gray-700">{msg.text}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          {!selectedChild && <p className="text-xs text-amber-600 text-center">Sélectionnez d'abord un enfant</p>}
+        </div>
+      </Modal>
 
       {/* Task Form Modal */}
       <Modal isOpen={showTaskForm} onClose={() => setShowTaskForm(false)} title="Nouvelle tâche" size="lg">

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Task, Wallet, Transaction, WithdrawalRequest, CalendarEvent, ShoppingItem, Notification } from '../types';
+import type { Task, Wallet, Transaction, WithdrawalRequest, CalendarEvent, ShoppingItem, Notification, FamilyMessage } from '../types';
 
 const today = new Date().toISOString().split('T')[0];
 const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
@@ -275,6 +275,9 @@ interface FamilyState {
   events: CalendarEvent[];
   shoppingItems: ShoppingItem[];
   notifications: Notification[];
+  messages: FamilyMessage[];
+  sendMessage: (fromId: string, toId: string, familyId: string, text: string, emoji: string) => void;
+  markMessageRead: (messageId: string) => void;
 
   // Task actions
   addTask: (task: Task) => void;
@@ -436,6 +439,23 @@ export const useFamilyStore = create<FamilyState>()(
         notifications: s.notifications.map(n => n.userId === userId ? { ...n, read: true } : n),
       })),
       addNotification: (notification) => set(s => ({ notifications: [notification, ...s.notifications] })),
+
+      messages: [],
+      sendMessage: (fromId, toId, familyId, text, emoji) => set(s => ({
+        messages: [{
+          id: `msg-${Date.now()}`,
+          familyId,
+          fromId,
+          toId,
+          text,
+          emoji,
+          read: false,
+          createdAt: new Date().toISOString(),
+        }, ...s.messages],
+      })),
+      markMessageRead: (messageId) => set(s => ({
+        messages: s.messages.map(m => m.id === messageId ? { ...m, read: true } : m),
+      })),
     }),
     { name: 'familyvault-data' }
   )
