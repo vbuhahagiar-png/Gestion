@@ -1,153 +1,83 @@
-import React, { useEffect } from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { useStore } from './store/useStore';
-import { AppLayout } from './components/Layout/AppLayout';
-import { LoginPage } from './pages/LoginPage';
-import { ChildDashboard } from './pages/ChildDashboard';
-import { ParentDashboard } from './pages/ParentDashboard';
-import { WalletPage } from './pages/WalletPage';
-import { ChoresPage } from './pages/ChoresPage';
-import { GoalsPage } from './pages/GoalsPage';
-import { MarketplacePage } from './pages/MarketplacePage';
-import { AchievementsPage } from './pages/AchievementsPage';
-import { SettingsPage } from './pages/SettingsPage';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from './store/useAuthStore';
+import { ToastProvider } from './components/UI/Toast';
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode; requireParent?: boolean }> = ({
-  children,
-  requireParent = false,
-}) => {
-  const { currentUser, isParentUnlocked } = useStore();
-  const navigate = useNavigate();
+// Layout
+import { ParentShell, ChildShell } from './components/Layout/AppShell';
 
-  useEffect(() => {
-    if (!currentUser) {
-      navigate('/login', { replace: true });
-      return;
-    }
-    if (requireParent && (!isParentUnlocked || currentUser.type !== 'parent')) {
-      navigate('/login', { replace: true });
-    }
-  }, [currentUser, isParentUnlocked, requireParent, navigate]);
+// Pages
+import { LandingPage } from './pages/LandingPage';
+import { LoginPage } from './pages/auth/LoginPage';
+import { SignupPage } from './pages/auth/SignupPage';
+import { OnboardingPage } from './pages/auth/OnboardingPage';
 
-  if (!currentUser) return null;
-  if (requireParent && (!isParentUnlocked || currentUser.type !== 'parent')) return null;
+// Parent pages
+import { ParentDashboard } from './pages/parent/ParentDashboard';
+import { TasksPage } from './pages/parent/TasksPage';
+import { ChildrenPage } from './pages/parent/ChildrenPage';
+import { CalendarPage } from './pages/parent/CalendarPage';
+import { ShoppingListPage } from './pages/parent/ShoppingListPage';
+import { SettingsPage } from './pages/parent/SettingsPage';
 
-  return <>{children}</>;
+// Child pages
+import { ChildDashboard } from './pages/child/ChildDashboard';
+import { MyTasksPage } from './pages/child/MyTasksPage';
+import { MyWalletPage } from './pages/child/MyWalletPage';
+import { MyBadgesPage } from './pages/child/MyBadgesPage';
+import { ChildCalendarPage } from './pages/child/CalendarPage';
+
+const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useAuthStore();
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
-const ChildRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { currentUser } = useStore();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!currentUser) {
-      navigate('/login', { replace: true });
-    } else if (currentUser.type !== 'child') {
-      navigate('/parent', { replace: true });
-    }
-  }, [currentUser, navigate]);
-
-  if (!currentUser || currentUser.type !== 'child') return null;
-  return <>{children}</>;
+const RootRedirect: React.FC = () => {
+  const { isAuthenticated, currentUser } = useAuthStore();
+  if (!isAuthenticated) return <Navigate to="/landing" replace />;
+  if (currentUser?.role === 'parent') return <Navigate to="/parent" replace />;
+  if (currentUser?.role === 'child') return <Navigate to={`/child/${currentUser.id}`} replace />;
+  return <Navigate to="/login" replace />;
 };
 
 function App() {
-  const { currentUser, isParentUnlocked } = useStore();
-
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route
-        path="/"
-        element={
-          currentUser ? (
-            currentUser.type === 'parent' && isParentUnlocked ? (
-              <Navigate to="/parent" replace />
-            ) : currentUser.type === 'child' ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
+    <BrowserRouter basename="/Gestion">
+      <ToastProvider>
+        <Routes>
+          {/* Root */}
+          <Route path="/" element={<RootRedirect />} />
 
-      {/* App Layout wrapper */}
-      <Route element={<AppLayout />}>
-        {/* Child routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ChildRoute>
-              <ChildDashboard />
-            </ChildRoute>
-          }
-        />
-        <Route
-          path="/wallet"
-          element={
-            <ChildRoute>
-              <WalletPage />
-            </ChildRoute>
-          }
-        />
-        <Route
-          path="/chores"
-          element={
-            <ChildRoute>
-              <ChoresPage />
-            </ChildRoute>
-          }
-        />
-        <Route
-          path="/goals"
-          element={
-            <ChildRoute>
-              <GoalsPage />
-            </ChildRoute>
-          }
-        />
-        <Route
-          path="/achievements"
-          element={
-            <ChildRoute>
-              <AchievementsPage />
-            </ChildRoute>
-          }
-        />
-        <Route
-          path="/marketplace"
-          element={
-            <ProtectedRoute>
-              <MarketplacePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <SettingsPage />
-            </ProtectedRoute>
-          }
-        />
+          {/* Public */}
+          <Route path="/landing" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
 
-        {/* Parent route */}
-        <Route
-          path="/parent"
-          element={
-            <ProtectedRoute requireParent>
-              <ParentDashboard />
-            </ProtectedRoute>
-          }
-        />
-      </Route>
+          {/* Parent routes */}
+          <Route path="/parent" element={<PrivateRoute><ParentShell /></PrivateRoute>}>
+            <Route index element={<ParentDashboard />} />
+            <Route path="tasks" element={<TasksPage />} />
+            <Route path="children" element={<ChildrenPage />} />
+            <Route path="calendar" element={<CalendarPage />} />
+            <Route path="shopping" element={<ShoppingListPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
 
-      {/* Catch all */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+          {/* Child routes */}
+          <Route path="/child/:childId" element={<PrivateRoute><ChildShell /></PrivateRoute>}>
+            <Route index element={<ChildDashboard />} />
+            <Route path="tasks" element={<MyTasksPage />} />
+            <Route path="wallet" element={<MyWalletPage />} />
+            <Route path="badges" element={<MyBadgesPage />} />
+            <Route path="calendar" element={<ChildCalendarPage />} />
+          </Route>
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </ToastProvider>
+    </BrowserRouter>
   );
 }
 

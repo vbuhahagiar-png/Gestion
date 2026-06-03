@@ -1,42 +1,81 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CheckCircle, XCircle, AlertCircle, Info, X } from 'lucide-react';
-import { useStore } from '../../store/useStore';
-import type { Toast as ToastType } from '../../types';
 
-const iconMap = {
-  success: <CheckCircle size={20} className="text-success-500" />,
-  error: <XCircle size={20} className="text-danger-500" />,
-  warning: <AlertCircle size={20} className="text-accent-500" />,
-  info: <Info size={20} className="text-primary-500" />,
-};
+export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
-const colorMap: Record<ToastType['type'], string> = {
-  success: 'border-l-success-500 bg-success-50',
-  error: 'border-l-danger-500 bg-danger-50',
-  warning: 'border-l-accent-500 bg-accent-50',
-  info: 'border-l-primary-500 bg-primary-50',
-};
+interface ToastProps {
+  message: string;
+  type?: ToastType;
+  onClose: () => void;
+  duration?: number;
+}
 
-export const ToastContainer: React.FC = () => {
-  const { toasts, removeToast } = useStore();
+export const Toast: React.FC<ToastProps> = ({ message, type = 'success', onClose, duration = 3000 }) => {
+  useEffect(() => {
+    const timer = setTimeout(onClose, duration);
+    return () => clearTimeout(timer);
+  }, [onClose, duration]);
+
+  const configs = {
+    success: { icon: CheckCircle, bg: 'bg-emerald-500', text: 'text-white' },
+    error: { icon: XCircle, bg: 'bg-red-500', text: 'text-white' },
+    warning: { icon: AlertCircle, bg: 'bg-amber-500', text: 'text-white' },
+    info: { icon: Info, bg: 'bg-blue-500', text: 'text-white' },
+  };
+
+  const { icon: Icon, bg, text } = configs[type];
 
   return (
-    <div className="fixed bottom-24 right-4 z-50 flex flex-col gap-2 md:bottom-4">
-      {toasts.map((toast) => (
-        <div
-          key={toast.id}
-          className={`flex items-center gap-3 min-w-64 max-w-sm p-4 rounded-2xl shadow-lg border-l-4 ${colorMap[toast.type]} animate-slide-up`}
-        >
-          {iconMap[toast.type]}
-          <span className="flex-1 text-sm font-inter font-500 text-gray-700">{toast.message}</span>
-          <button
-            onClick={() => removeToast(toast.id)}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X size={16} />
-          </button>
-        </div>
-      ))}
+    <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl ${bg} ${text} animate-slide-up max-w-xs w-full mx-4`}>
+      <Icon className="w-5 h-5 shrink-0" />
+      <span className="text-sm font-medium flex-1">{message}</span>
+      <button onClick={onClose} className="shrink-0 opacity-75 hover:opacity-100">
+        <X className="w-4 h-4" />
+      </button>
     </div>
+  );
+};
+
+// Toast context
+interface ToastState {
+  show: (message: string, type?: ToastType) => void;
+}
+
+let toastCallback: ((message: string, type?: ToastType) => void) | null = null;
+
+export const useToast = (): ToastState => ({
+  show: (message, type) => toastCallback?.(message, type),
+});
+
+interface ToastContainerProps {
+  children: React.ReactNode;
+}
+
+interface ToastItem {
+  id: number;
+  message: string;
+  type: ToastType;
+}
+
+export const ToastProvider: React.FC<ToastContainerProps> = ({ children }) => {
+  const [toasts, setToasts] = React.useState<ToastItem[]>([]);
+
+  React.useEffect(() => {
+    toastCallback = (message: string, type: ToastType = 'success') => {
+      const id = Date.now();
+      setToasts(prev => [...prev, { id, message, type }]);
+    };
+    return () => { toastCallback = null; };
+  }, []);
+
+  const remove = (id: number) => setToasts(prev => prev.filter(t => t.id !== id));
+
+  return (
+    <>
+      {children}
+      {toasts.map(t => (
+        <Toast key={t.id} message={t.message} type={t.type} onClose={() => remove(t.id)} />
+      ))}
+    </>
   );
 };

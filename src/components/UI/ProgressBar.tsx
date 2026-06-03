@@ -1,9 +1,10 @@
 import React from 'react';
 
 interface ProgressBarProps {
-  value: number; // 0–100
-  color?: 'purple' | 'pink' | 'green' | 'yellow' | 'blue';
-  size?: 'sm' | 'md' | 'lg';
+  value: number;
+  max?: number;
+  color?: string;
+  height?: string;
   showLabel?: boolean;
   animated?: boolean;
   className?: string;
@@ -11,40 +12,25 @@ interface ProgressBarProps {
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({
   value,
-  color = 'purple',
-  size = 'md',
+  max = 100,
+  color = 'from-violet-500 to-purple-600',
+  height = 'h-3',
   showLabel = false,
   animated = true,
   className = '',
 }) => {
-  const clampedValue = Math.min(100, Math.max(0, value));
-
-  const colors = {
-    purple: 'from-primary-400 to-primary-600',
-    pink: 'from-secondary-400 to-secondary-600',
-    green: 'from-success-400 to-success-600',
-    yellow: 'from-accent-400 to-accent-500',
-    blue: 'from-blue-400 to-blue-600',
-  };
-
-  const sizes = {
-    sm: 'h-2',
-    md: 'h-3',
-    lg: 'h-4',
-  };
+  const percent = Math.min(100, Math.max(0, (value / max) * 100));
 
   return (
-    <div className={`w-full ${className}`}>
-      <div className={`w-full bg-gray-100 rounded-full overflow-hidden ${sizes[size]}`}>
+    <div className={`relative ${className}`}>
+      <div className={`${height} bg-gray-100 rounded-full overflow-hidden`}>
         <div
-          className={`h-full bg-gradient-to-r ${colors[color]} rounded-full ${animated ? 'transition-all duration-700 ease-out' : ''}`}
-          style={{ width: `${clampedValue}%` }}
+          className={`${height} bg-gradient-to-r ${color} rounded-full transition-all duration-700 ease-out ${animated ? 'animate-pulse-slow' : ''}`}
+          style={{ width: `${percent}%` }}
         />
       </div>
       {showLabel && (
-        <div className="flex justify-between mt-1">
-          <span className="text-xs font-inter text-gray-500">{Math.round(clampedValue)}%</span>
-        </div>
+        <span className="text-xs text-gray-500 mt-1 block text-right">{Math.round(percent)}%</span>
       )}
     </div>
   );
