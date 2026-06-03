@@ -24,14 +24,16 @@ export const LoginPage: React.FC = () => {
   };
 
   const handlePinSubmit = () => {
-    const success = unlockParent(pin);
-    if (success && parent) {
+    if (parent) {
       login(parent.id);
-      setShowPinModal(false);
-      navigate('/parent');
-    } else {
-      setPinError(true);
-      setPin('');
+      const success = unlockParent(pin);
+      if (success) {
+        setShowPinModal(false);
+        navigate('/parent');
+      } else {
+        setPinError(true);
+        setPin('');
+      }
     }
   };
 
