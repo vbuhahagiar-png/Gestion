@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal } from '../UI/Modal';
 import { Button } from '../UI/Button';
 import { Check, Zap, Star } from 'lucide-react';
-import { redirectToCheckout, PRICES } from '../../lib/stripe';
+import { redirectToCheckout } from '../../lib/stripe';
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -11,12 +11,10 @@ interface PricingModalProps {
 
 export const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) => {
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('yearly');
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
-  const handleCheckout = async () => {
-    setLoading(true);
-    await redirectToCheckout(billing === 'monthly' ? PRICES.monthly : PRICES.yearly);
-    setLoading(false);
+  const handleCheckout = () => {
+    redirectToCheckout(billing);
   };
 
   return (
@@ -73,10 +71,6 @@ export const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) =
         <Button variant="primary" fullWidth size="lg" loading={loading} onClick={handleCheckout}>
           Passer Premium avec Stripe
         </Button>
-
-        <div className="bg-amber-50 rounded-2xl p-3 text-xs text-amber-700">
-          <strong>💡 Pour activer les paiements :</strong> Créez un compte Stripe sur stripe.com, puis ajoutez <code className="bg-amber-100 px-1 rounded">VITE_STRIPE_PUBLISHABLE_KEY</code> dans votre fichier <code className="bg-amber-100 px-1 rounded">.env</code>
-        </div>
 
         <p className="text-xs text-center text-gray-400">
           Annulable à tout moment · Paiement sécurisé par Stripe
