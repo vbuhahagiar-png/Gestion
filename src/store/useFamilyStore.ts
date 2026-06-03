@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Task, Wallet, Transaction, WithdrawalRequest, CalendarEvent, ShoppingItem, Notification, FamilyMessage } from '../types';
+import type { Task, Wallet, Transaction, WithdrawalRequest, CalendarEvent, ShoppingItem, Notification, FamilyMessage, StoreReward, RewardClaim } from '../types';
+import { useAuthStore } from './useAuthStore';
 
 const today = new Date().toISOString().split('T')[0];
 const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
@@ -267,6 +268,17 @@ const DEMO_NOTIFICATIONS: Notification[] = [
   },
 ];
 
+const DEMO_REWARDS: StoreReward[] = [
+  { id: 'reward-1', familyId: 'family-martin', title: '1h de jeux vidéo', description: 'Une heure supplémentaire de jeux vidéo ou tablette', emoji: '🎮', coinCost: 50, color: 'from-blue-400 to-indigo-500', available: true, createdAt: '2024-01-01T00:00:00Z' },
+  { id: 'reward-2', familyId: 'family-martin', title: 'Choisir le film du soir', description: 'Tu choisis le film ou la série du soir pour toute la famille', emoji: '🎬', coinCost: 30, color: 'from-purple-400 to-pink-500', available: true, createdAt: '2024-01-01T00:00:00Z' },
+  { id: 'reward-3', familyId: 'family-martin', title: 'Pas de tâches samedi', description: 'Un samedi entier sans corvées !', emoji: '🌴', coinCost: 120, color: 'from-green-400 to-teal-500', available: true, createdAt: '2024-01-01T00:00:00Z' },
+  { id: 'reward-4', familyId: 'family-martin', title: 'Pyjama party', description: 'Inviter un ami pour dormir à la maison', emoji: '🛏️', coinCost: 200, color: 'from-yellow-400 to-orange-500', available: true, createdAt: '2024-01-01T00:00:00Z' },
+  { id: 'reward-5', familyId: 'family-martin', title: 'Restaurant au choix', description: 'Tu choisis le restaurant pour le prochain repas en famille', emoji: '🍕', coinCost: 150, color: 'from-rose-400 to-red-500', available: true, createdAt: '2024-01-01T00:00:00Z' },
+  { id: 'reward-6', familyId: 'family-martin', title: 'Coucher 30min plus tard', description: 'Une soirée avec 30 minutes de plus avant de dormir', emoji: '🌙', coinCost: 40, color: 'from-violet-400 to-purple-500', available: true, createdAt: '2024-01-01T00:00:00Z' },
+];
+
+const DEMO_CLAIMS: RewardClaim[] = [];
+
 interface FamilyState {
   tasks: Task[];
   wallets: Wallet[];
@@ -310,6 +322,18 @@ interface FamilyState {
   markNotificationRead: (notifId: string) => void;
   markAllNotificationsRead: (userId: string) => void;
   addNotification: (notification: Notification) => void;
+
+  // Store reward state
+  storeRewards: StoreReward[];
+  rewardClaims: RewardClaim[];
+
+  // Store reward actions
+  addStoreReward: (reward: StoreReward) => void;
+  updateStoreReward: (rewardId: string, updates: Partial<StoreReward>) => void;
+  deleteStoreReward: (rewardId: string) => void;
+  claimReward: (claim: RewardClaim) => void;
+  approveRewardClaim: (claimId: string, childId: string) => void;
+  rejectRewardClaim: (claimId: string) => void;
 }
 
 export const useFamilyStore = create<FamilyState>()(
@@ -322,6 +346,8 @@ export const useFamilyStore = create<FamilyState>()(
       events: DEMO_EVENTS,
       shoppingItems: DEMO_SHOPPING,
       notifications: DEMO_NOTIFICATIONS,
+      storeRewards: DEMO_REWARDS,
+      rewardClaims: DEMO_CLAIMS,
 
       addTask: (task) => set(s => ({ tasks: [task, ...s.tasks] })),
       updateTask: (taskId, updates) => set(s => ({ tasks: s.tasks.map(t => t.id === taskId ? { ...t, ...updates } : t) })),
@@ -347,6 +373,12 @@ export const useFamilyStore = create<FamilyState>()(
         const newBalance = (wallet?.balance || 0) + task.rewardMoney;
         const newTotalEarned = (wallet?.totalEarned || 0) + task.rewardMoney;
 
+        // Award coins = half XP value
+        const coinsEarned = Math.floor(task.rewardXP / 2);
+        if (coinsEarned > 0) {
+          useAuthStore.getState().addCoins(task.completedBy!, coinsEarned);
+        }
+
         set(s => ({
           tasks: s.tasks.map(t => t.id === taskId ? { ...t, status: 'done' as const, approvedAt: new Date().toISOString() } : t),
           wallets: s.wallets.map(w => w.childId === task.completedBy ? { ...w, balance: newBalance, totalEarned: newTotalEarned } : w),
@@ -364,7 +396,7 @@ export const useFamilyStore = create<FamilyState>()(
             userId: task.completedBy!,
             type: 'task_approved',
             title: 'Tâche validée ! 🎉',
-            body: `"${task.title}" a été validée ! Tu gagnes CHF ${task.rewardMoney.toFixed(2)}`,
+            body: `"${task.title}" a été validée ! Tu gagnes CHF ${task.rewardMoney.toFixed(2)}${coinsEarned > 0 ? ` et 🪙 ${coinsEarned} pièces` : ''}`,
             read: false,
             createdAt: new Date().toISOString(),
           }, ...s.notifications],
@@ -439,6 +471,21 @@ export const useFamilyStore = create<FamilyState>()(
         notifications: s.notifications.map(n => n.userId === userId ? { ...n, read: true } : n),
       })),
       addNotification: (notification) => set(s => ({ notifications: [notification, ...s.notifications] })),
+
+      addStoreReward: (reward) => set(s => ({ storeRewards: [...s.storeRewards, reward] })),
+      updateStoreReward: (rewardId, updates) => set(s => ({
+        storeRewards: s.storeRewards.map(r => r.id === rewardId ? { ...r, ...updates } : r),
+      })),
+      deleteStoreReward: (rewardId) => set(s => ({
+        storeRewards: s.storeRewards.filter(r => r.id !== rewardId),
+      })),
+      claimReward: (claim) => set(s => ({ rewardClaims: [claim, ...s.rewardClaims] })),
+      approveRewardClaim: (claimId, _childId) => set(s => ({
+        rewardClaims: s.rewardClaims.map(c => c.id === claimId ? { ...c, status: 'approved' as const, processedAt: new Date().toISOString() } : c),
+      })),
+      rejectRewardClaim: (claimId) => set(s => ({
+        rewardClaims: s.rewardClaims.map(c => c.id === claimId ? { ...c, status: 'rejected' as const, processedAt: new Date().toISOString() } : c),
+      })),
 
       messages: [],
       sendMessage: (fromId, toId, familyId, text, emoji) => set(s => ({

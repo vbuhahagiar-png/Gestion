@@ -23,6 +23,7 @@ const DEMO_USERS: User[] = [
     color: 'from-purple-500 to-indigo-600',
     level: 1,
     xp: 0,
+    coins: 0,
     streak: 0,
     lastActiveDate: new Date().toISOString().split('T')[0],
     unlockedBadges: [],
@@ -38,6 +39,7 @@ const DEMO_USERS: User[] = [
     pin: '1234',
     level: 5,
     xp: 1150,
+    coins: 120,
     streak: 12,
     lastActiveDate: new Date().toISOString().split('T')[0],
     unlockedBadges: ['first_task', 'tasks_5', 'tasks_10', 'streak_3', 'streak_7', 'maison_1', 'ecole_1', 'save_1', 'save_10', 'level_2', 'level_3'],
@@ -53,6 +55,7 @@ const DEMO_USERS: User[] = [
     pin: '5678',
     level: 3,
     xp: 340,
+    coins: 65,
     streak: 5,
     lastActiveDate: new Date().toISOString().split('T')[0],
     unlockedBadges: ['first_task', 'tasks_5', 'streak_3', 'sport_1', 'save_1', 'level_2'],
@@ -68,6 +71,7 @@ const DEMO_USERS: User[] = [
     pin: '9012',
     level: 2,
     xp: 180,
+    coins: 30,
     streak: 3,
     lastActiveDate: new Date().toISOString().split('T')[0],
     unlockedBadges: ['first_task', 'maison_1', 'streak_3', 'save_1'],
@@ -96,6 +100,7 @@ interface AuthState {
   switchToParent: () => void;
   updateUser: (userId: string, updates: Partial<User>) => void;
   updateFamily: (updates: Partial<Family>) => void;
+  addCoins: (userId: string, amount: number) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -126,7 +131,7 @@ export const useAuthStore = create<AuthState>()(
             avatar: c.avatar,
             color: ['from-pink-400 to-rose-500','from-blue-400 to-cyan-500','from-yellow-400 to-orange-500','from-green-400 to-teal-500'][Math.floor(Math.random()*4)],
             pin: c.pin || '1234',
-            level: 1, xp: 0, streak: 0,
+            level: 1, xp: 0, coins: 0, streak: 0,
             lastActiveDate: now.split('T')[0],
             unlockedBadges: [],
             createdAt: now,
@@ -150,7 +155,7 @@ export const useAuthStore = create<AuthState>()(
           email: pending?.email ?? '',
           avatar: parentAvatar,
           color: 'from-purple-500 to-indigo-600',
-          level: 1, xp: 0, streak: 0,
+          level: 1, xp: 0, coins: 0, streak: 0,
           lastActiveDate: now.split('T')[0],
           unlockedBadges: [],
           createdAt: now,
@@ -224,6 +229,15 @@ export const useAuthStore = create<AuthState>()(
         if (current) {
           set({ currentFamily: { ...current, ...updates } });
         }
+      },
+
+      addCoins: (userId, amount) => {
+        const users = get().allUsers.map(u => u.id === userId ? { ...u, coins: (u.coins || 0) + amount } : u);
+        const current = get().currentUser;
+        set({
+          allUsers: users,
+          currentUser: current?.id === userId ? { ...current, coins: (current.coins || 0) + amount } : current,
+        });
       },
     }),
     { name: 'familyvault-auth' }

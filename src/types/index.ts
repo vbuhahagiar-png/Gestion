@@ -17,6 +17,7 @@ export interface User {
   pin?: string;
   level: number;
   xp: number;
+  coins: number;
   streak: number;
   lastActiveDate: string;
   unlockedBadges: string[];
@@ -121,6 +122,28 @@ export interface FamilyMessage {
   emoji: string;
   read: boolean;
   createdAt: string;
+}
+
+export interface StoreReward {
+  id: string;
+  familyId: string;
+  title: string;
+  description: string;
+  emoji: string;
+  coinCost: number;
+  color: string;
+  available: boolean;
+  createdAt: string;
+}
+
+export interface RewardClaim {
+  id: string;
+  rewardId: string;
+  childId: string;
+  familyId: string;
+  status: 'pending' | 'approved' | 'rejected';
+  requestedAt: string;
+  processedAt?: string;
 }
 
 export interface Notification {

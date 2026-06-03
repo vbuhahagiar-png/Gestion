@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useParams } from 'react-router-dom';
-import { Home, CheckSquare, PiggyBank, Trophy, Calendar } from 'lucide-react';
+import { Home, CheckSquare, PiggyBank, Trophy, Store } from 'lucide-react';
 
 export const ChildNav: React.FC = () => {
   const { childId } = useParams<{ childId: string }>();
@@ -11,10 +11,10 @@ export const ChildNav: React.FC = () => {
     { to: `${base}/tasks`, icon: '✅', label: 'Tâches', lucide: CheckSquare },
     { to: `${base}/wallet`, icon: '💰', label: 'Cagnotte', lucide: PiggyBank },
     { to: `${base}/badges`, icon: '🏆', label: 'Badges', lucide: Trophy },
-    { to: `${base}/calendar`, icon: '📅', label: 'Calendrier', lucide: Calendar },
+    { to: `${base}/store`, icon: '🏪', label: 'Boutique', lucide: Store },
   ];
 
-  const colors = ['from-violet-500 to-purple-600', 'from-green-500 to-emerald-600', 'from-amber-500 to-orange-600', 'from-pink-500 to-rose-600', 'from-blue-500 to-cyan-600'];
+  const colors = ['from-violet-500 to-purple-600', 'from-green-500 to-emerald-600', 'from-amber-500 to-orange-600', 'from-pink-500 to-rose-600', 'from-purple-500 to-indigo-600'];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-100 z-40">

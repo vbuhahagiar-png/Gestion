@@ -8,7 +8,7 @@ import { Avatar } from '../../components/UI/Avatar';
 import { TaskCard } from '../../components/Tasks/TaskCard';
 import { BADGES } from '../../data/badges';
 import { useLevel } from '../../hooks/useLevel';
-import { getStreakEmoji, getStreakMessage } from '../../hooks/useStreak';
+import { getStreakEmoji } from '../../hooks/useStreak';
 import { useFamilyStore as useFS } from '../../store/useFamilyStore';
 
 export const ChildDashboard: React.FC = () => {
@@ -92,24 +92,33 @@ export const ChildDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Streak + Balance row */}
-      <div className="px-4 mb-5 grid grid-cols-2 gap-3">
+      {/* Streak + Balance + Coins row */}
+      <div className="px-4 mb-5 grid grid-cols-3 gap-3">
         {/* Streak */}
-        <div className="bg-gradient-to-br from-orange-400 to-red-500 rounded-3xl p-4 text-white shadow-lg shadow-orange-200">
-          <div className="text-3xl mb-1 animate-wiggle">{getStreakEmoji(child.streak)}</div>
-          <div className="text-2xl font-black">{child.streak}</div>
-          <div className="text-xs opacity-90">{child.streak === 1 ? 'jour' : 'jours'} d'affilée</div>
-          <div className="text-xs opacity-75 mt-0.5">{getStreakMessage(child.streak)}</div>
+        <div className="bg-gradient-to-br from-orange-400 to-red-500 rounded-3xl p-3 text-white shadow-lg shadow-orange-200">
+          <div className="text-2xl mb-0.5 animate-wiggle">{getStreakEmoji(child.streak)}</div>
+          <div className="text-xl font-black">{child.streak}</div>
+          <div className="text-[10px] opacity-90">{child.streak === 1 ? 'jour' : 'jours'} d'affilée</div>
         </div>
 
         {/* Balance */}
-        <div className="bg-gradient-to-br from-emerald-400 to-green-600 rounded-3xl p-4 text-white shadow-lg shadow-emerald-200 cursor-pointer" onClick={() => navigate(`/child/${childId}/wallet`)}>
-          <div className="text-2xl mb-1 animate-float">💰</div>
-          <div className="text-2xl font-black">CHF {wallet?.balance.toFixed(2) || '0.00'}</div>
-          <div className="text-xs opacity-90">Ma cagnotte</div>
+        <div className="bg-gradient-to-br from-emerald-400 to-green-600 rounded-3xl p-3 text-white shadow-lg shadow-emerald-200 cursor-pointer" onClick={() => navigate(`/child/${childId}/wallet`)}>
+          <div className="text-2xl mb-0.5 animate-float">💰</div>
+          <div className="text-lg font-black">CHF {wallet?.balance.toFixed(2) || '0.00'}</div>
+          <div className="text-[10px] opacity-90">Ma cagnotte</div>
           {pendingWithdrawals.length > 0 && (
-            <div className="text-xs opacity-75 mt-0.5">⏳ Retrait en attente</div>
+            <div className="text-[10px] opacity-75 mt-0.5">⏳ En attente</div>
           )}
+        </div>
+
+        {/* Coins */}
+        <div
+          className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-3xl p-3 text-white shadow-lg shadow-amber-200 cursor-pointer"
+          onClick={() => navigate(`/child/${childId}/store`)}
+        >
+          <div className="text-2xl mb-0.5">🪙</div>
+          <div className="text-xl font-black">{child.coins || 0}</div>
+          <div className="text-[10px] opacity-90">Mes pièces</div>
         </div>
       </div>
 

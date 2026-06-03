@@ -26,6 +26,10 @@ import { MyTasksPage } from './pages/child/MyTasksPage';
 import { MyWalletPage } from './pages/child/MyWalletPage';
 import { MyBadgesPage } from './pages/child/MyBadgesPage';
 import { ChildCalendarPage } from './pages/child/CalendarPage';
+import { StorePage } from './pages/child/StorePage';
+
+// Parent reward store
+import { RewardsPage } from './pages/parent/RewardsPage';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
@@ -61,6 +65,7 @@ function App() {
             <Route path="children" element={<ChildrenPage />} />
             <Route path="calendar" element={<CalendarPage />} />
             <Route path="shopping" element={<ShoppingListPage />} />
+            <Route path="rewards" element={<RewardsPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 
@@ -71,6 +76,7 @@ function App() {
             <Route path="wallet" element={<MyWalletPage />} />
             <Route path="badges" element={<MyBadgesPage />} />
             <Route path="calendar" element={<ChildCalendarPage />} />
+            <Route path="store" element={<StorePage />} />
           </Route>
 
           {/* Fallback */}

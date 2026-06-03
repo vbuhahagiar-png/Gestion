@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, CheckSquare, Users, Calendar, ShoppingCart, Settings, LogOut, Vault } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Users, Calendar, ShoppingCart, Settings, LogOut, Vault, Store } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 
 const navItems = [
@@ -9,6 +9,7 @@ const navItems = [
   { to: '/parent/children', icon: Users, label: 'Enfants' },
   { to: '/parent/calendar', icon: Calendar, label: 'Calendrier' },
   { to: '/parent/shopping', icon: ShoppingCart, label: 'Courses' },
+  { to: '/parent/rewards', icon: Store, label: 'Boutique' },
   { to: '/parent/settings', icon: Settings, label: 'Paramètres' },
 ];
 

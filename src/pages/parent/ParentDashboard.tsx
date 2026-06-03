@@ -50,7 +50,7 @@ const ChildCard: React.FC<{ userId: string }> = ({ userId }) => {
 export const ParentDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser, currentFamily, allUsers } = useAuthStore();
-  const { tasks, withdrawals, addTask, approveTask, rejectTask, sendMessage } = useFamilyStore();
+  const { tasks, withdrawals, rewardClaims, storeRewards, addTask, approveTask, rejectTask, sendMessage, approveRewardClaim, rejectRewardClaim } = useFamilyStore();
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
   const [newEvent, setNewEvent] = useState({ title: '', date: '', emoji: '📅' });
@@ -74,6 +74,7 @@ export const ParentDashboard: React.FC = () => {
   const children = allUsers.filter(u => u.role === 'child');
   const pendingTasks = tasks.filter(t => t.status === 'pending_approval');
   const pendingWithdrawals = withdrawals.filter(w => w.status === 'pending');
+  const pendingClaims = rewardClaims.filter(c => c.status === 'pending');
 
   // Weekly stats
   const oneWeekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
@@ -190,6 +191,42 @@ export const ParentDashboard: React.FC = () => {
           </div>
           <div className="mt-2 bg-blue-50 rounded-2xl px-3 py-2 text-xs text-blue-700 font-medium">
             💡 Pensez à remettre l'argent en Twint ou en espèces après validation !
+          </div>
+        </div>
+      )}
+
+      {/* Pending reward claims */}
+      {pendingClaims.length > 0 && (
+        <div>
+          <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <span className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-xs">🏪</span>
+            Demandes de récompenses ({pendingClaims.length})
+          </h2>
+          <div className="space-y-2">
+            {pendingClaims.slice(0, 3).map(claim => {
+              const child = allUsers.find(u => u.id === claim.childId);
+              const reward = storeRewards.find(r => r.id === claim.rewardId);
+              return (
+                <div key={claim.id} className="bg-white rounded-3xl p-4 shadow-[0_4px_24px_rgba(0,0,0,0.06)] flex items-center gap-3">
+                  <Avatar emoji={child?.avatar || '👦'} color={child?.color || 'from-blue-400 to-cyan-500'} size="sm" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-gray-900 text-sm">
+                      {child?.name} · {reward?.emoji} {reward?.title}
+                    </div>
+                    <div className="text-xs text-gray-500">🪙 {reward?.coinCost} pièces</div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => approveRewardClaim(claim.id, claim.childId)} className="w-9 h-9 bg-emerald-500 text-white rounded-xl flex items-center justify-center text-lg hover:bg-emerald-600 transition-colors">✓</button>
+                    <button onClick={() => rejectRewardClaim(claim.id)} className="w-9 h-9 bg-red-100 text-red-500 rounded-xl flex items-center justify-center text-lg hover:bg-red-200 transition-colors">✗</button>
+                  </div>
+                </div>
+              );
+            })}
+            {pendingClaims.length > 3 && (
+              <button onClick={() => navigate('/parent/rewards')} className="w-full py-2 text-sm text-purple-600 font-semibold">
+                Voir toutes ({pendingClaims.length - 3} de plus)
+              </button>
+            )}
           </div>
         </div>
       )}
