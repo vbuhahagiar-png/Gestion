@@ -75,13 +75,23 @@ const DEMO_USERS: User[] = [
   },
 ];
 
+interface PendingSignup {
+  name: string;
+  email: string;
+  password: string;
+  familyName: string;
+}
+
 interface AuthState {
   currentUser: User | null;
   currentFamily: Family | null;
   isAuthenticated: boolean;
   allUsers: User[];
+  pendingSignup: PendingSignup | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  setPendingSignup: (data: PendingSignup) => void;
+  createFamily: (opts: { familyName: string; parentAvatar: string; children: { name: string; age: string; avatar: string; pin: string }[] }) => void;
   switchToChild: (childId: string, pin: string) => boolean;
   switchToParent: () => void;
   updateUser: (userId: string, updates: Partial<User>) => void;
@@ -95,6 +105,67 @@ export const useAuthStore = create<AuthState>()(
       currentFamily: null,
       isAuthenticated: false,
       allUsers: DEMO_USERS,
+      pendingSignup: null,
+
+      setPendingSignup: (data) => set({ pendingSignup: data }),
+
+      createFamily: ({ familyName, parentAvatar, children }) => {
+        const pending = get().pendingSignup;
+        const uid = () => Math.random().toString(36).slice(2, 10);
+        const inviteCode = Math.random().toString(36).slice(2, 8).toUpperCase();
+        const now = new Date().toISOString();
+
+        const parentId = 'parent-' + uid();
+        const childUsers: User[] = children
+          .filter(c => c.name.trim())
+          .map(c => ({
+            id: 'child-' + uid(),
+            role: 'child' as const,
+            familyId: '',
+            name: c.name.trim(),
+            avatar: c.avatar,
+            color: ['from-pink-400 to-rose-500','from-blue-400 to-cyan-500','from-yellow-400 to-orange-500','from-green-400 to-teal-500'][Math.floor(Math.random()*4)],
+            pin: c.pin || '1234',
+            level: 1, xp: 0, streak: 0,
+            lastActiveDate: now.split('T')[0],
+            unlockedBadges: [],
+            createdAt: now,
+          }));
+
+        const family: Family = {
+          id: 'family-' + uid(),
+          name: familyName || (pending?.familyName ?? 'Ma Famille'),
+          inviteCode,
+          parentIds: [parentId],
+          childIds: childUsers.map(c => c.id),
+          plan: 'free',
+          createdAt: now,
+        };
+
+        const parent: User = {
+          id: parentId,
+          role: 'parent',
+          familyId: family.id,
+          name: pending?.name ?? 'Parent',
+          email: pending?.email ?? '',
+          avatar: parentAvatar,
+          color: 'from-purple-500 to-indigo-600',
+          level: 1, xp: 0, streak: 0,
+          lastActiveDate: now.split('T')[0],
+          unlockedBadges: [],
+          createdAt: now,
+        };
+
+        const allUsers = [parent, ...childUsers.map(c => ({ ...c, familyId: family.id }))];
+
+        set({
+          currentUser: parent,
+          currentFamily: family,
+          isAuthenticated: true,
+          allUsers,
+          pendingSignup: null,
+        });
+      },
 
       login: async (email: string, password: string) => {
         if (email === 'demo@familyvault.ch' && password === 'demo1234') {

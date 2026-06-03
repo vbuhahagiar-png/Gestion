@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Vault } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
+import { useAuthStore } from '../../store/useAuthStore';
 
 export const SignupPage: React.FC = () => {
   const navigate = useNavigate();
+  const { setPendingSignup } = useAuthStore();
   const [form, setForm] = useState({ name: '', email: '', password: '', familyName: '', terms: false });
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -13,10 +15,8 @@ export const SignupPage: React.FC = () => {
     e.preventDefault();
     if (!form.terms) return;
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigate('/onboarding');
-    }, 800);
+    setPendingSignup({ name: form.name, email: form.email, password: form.password, familyName: form.familyName });
+    setTimeout(() => { setLoading(false); navigate('/onboarding'); }, 500);
   };
 
   const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }));

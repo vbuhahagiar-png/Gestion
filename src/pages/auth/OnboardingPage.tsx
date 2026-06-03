@@ -16,13 +16,13 @@ interface ChildInput {
 
 export const OnboardingPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuthStore();
+  const { createFamily, pendingSignup, currentFamily } = useAuthStore();
   const [step, setStep] = useState(1);
-  const [familyName, setFamilyName] = useState('');
+  const [familyName, setFamilyName] = useState(pendingSignup?.familyName ?? '');
   const [parentAvatar, setParentAvatar] = useState('👩‍💼');
   const [children, setChildren] = useState<ChildInput[]>([{ name: '', age: '', avatar: '👦', pin: '' }]);
   const [copied, setCopied] = useState(false);
-  const inviteCode = 'FAM123';
+  const inviteCode = currentFamily?.inviteCode ?? '------';
 
   const addChild = () => {
     if (children.length < 4) {
@@ -34,8 +34,7 @@ export const OnboardingPage: React.FC = () => {
     setChildren(c => c.map((ch, idx) => idx === i ? { ...ch, [k]: v } : ch));
   };
 
-  const handleFinish = async () => {
-    await login('demo@familyvault.ch', 'demo1234');
+  const handleFinish = () => {
     navigate('/parent');
   };
 
@@ -167,8 +166,9 @@ export const OnboardingPage: React.FC = () => {
 
               <div className="flex gap-3">
                 <Button variant="secondary" onClick={() => setStep(1)} fullWidth>Retour</Button>
-                <Button variant="primary" onClick={() => setStep(3)} fullWidth
-                  disabled={!children.some(c => c.name.trim())}>
+                <Button variant="primary" fullWidth
+                  disabled={!children.some(c => c.name.trim())}
+                  onClick={() => { createFamily({ familyName, parentAvatar, children }); setStep(3); }}>
                   Continuer →
                 </Button>
               </div>
