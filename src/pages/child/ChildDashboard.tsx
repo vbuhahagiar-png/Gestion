@@ -139,6 +139,14 @@ export const ChildDashboard: React.FC = () => {
               />
             ))}
           </div>
+          {/* Encouraging message */}
+          <p className="text-center text-xs text-gray-400 font-medium mt-3">
+            {[
+              'Tu es incroyable ! 💪',
+              'Continue comme ça ! 🚀',
+              'Ta famille est fière de toi ! ❤️',
+            ][Math.floor(Date.now() / 86400000) % 3]}
+          </p>
         </div>
       )}
 

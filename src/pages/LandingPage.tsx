@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Star, Shield, Zap, Users, BarChart3, Smartphone, ChevronDown, ChevronUp, Vault } from 'lucide-react';
 import { Button } from '../components/UI/Button';
-import { PricingModal } from '../components/Premium/PricingModal';
+import { ChatWidget } from '../components/ChatWidget';
 
 const features = [
   { icon: CheckCircle, title: 'Gestion des tâches', description: 'Créez et assignez des tâches à chaque enfant avec récompenses personnalisées', color: 'text-emerald-500', bg: 'bg-emerald-100' },
@@ -35,7 +35,6 @@ const faqs = [
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-  const [pricingOpen, setPricingOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
@@ -181,7 +180,7 @@ export const LandingPage: React.FC = () => {
                   </div>
                 ))}
               </div>
-              <Button variant="secondary" fullWidth onClick={() => navigate('/signup')}>Commencer gratuitement</Button>
+              <Button variant="secondary" fullWidth onClick={() => navigate('/signup')}>Commencer gratuitement →</Button>
             </div>
 
             {/* Premium */}
@@ -202,8 +201,8 @@ export const LandingPage: React.FC = () => {
                   </div>
                 ))}
               </div>
-              <Button variant="secondary" fullWidth onClick={() => setPricingOpen(true)}>
-                Payer avec Stripe 💳
+              <Button variant="secondary" fullWidth onClick={() => navigate('/signup?plan=premium')}>
+                Créer mon compte Premium →
               </Button>
             </div>
           </div>
@@ -286,7 +285,7 @@ export const LandingPage: React.FC = () => {
         <p className="text-xs mt-1">Données stockées localement · Confidentialité garantie</p>
       </footer>
 
-      <PricingModal isOpen={pricingOpen} onClose={() => setPricingOpen(false)} />
+      <ChatWidget />
     </div>
   );
 };

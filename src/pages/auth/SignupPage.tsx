@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, Vault } from 'lucide-react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { Eye, EyeOff, Vault, Sparkles } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
 import { useAuthStore } from '../../store/useAuthStore';
 
 export const SignupPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isPremium = searchParams.get('plan') === 'premium';
   const { setPendingSignup } = useAuthStore();
   const [form, setForm] = useState({ name: '', email: '', password: '', familyName: '', terms: false });
   const [showPwd, setShowPwd] = useState(false);
@@ -16,7 +18,8 @@ export const SignupPage: React.FC = () => {
     if (!form.terms) return;
     setLoading(true);
     setPendingSignup({ name: form.name, email: form.email, password: form.password, familyName: form.familyName });
-    setTimeout(() => { setLoading(false); navigate('/onboarding'); }, 500);
+    const onboardingUrl = isPremium ? '/onboarding?plan=premium' : '/onboarding';
+    setTimeout(() => { setLoading(false); navigate(onboardingUrl); }, 500);
   };
 
   const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }));
@@ -24,12 +27,27 @@ export const SignupPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 to-purple-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl shadow-purple-100 w-full max-w-sm p-7">
+        {/* Premium banner */}
+        {isPremium && (
+          <div className="mb-5 bg-gradient-to-r from-violet-600 to-purple-700 rounded-2xl px-4 py-3 flex items-start gap-3">
+            <Sparkles className="w-5 h-5 text-yellow-300 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-white font-bold text-sm">Vous avez choisi Premium ✨</p>
+              <p className="text-purple-200 text-xs mt-0.5">
+                Votre compte sera créé, puis vous serez redirigé vers le paiement.
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col items-center mb-7">
           <div className="w-14 h-14 bg-gradient-to-br from-violet-500 to-purple-700 rounded-2xl flex items-center justify-center mb-3 shadow-lg shadow-purple-200">
             <Vault className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-black text-gray-900">Créer un compte</h1>
-          <p className="text-gray-500 text-sm mt-1">Rejoignez TiPoche gratuitement</p>
+          <p className="text-gray-500 text-sm mt-1">
+            {isPremium ? 'Rejoignez TiPoche Premium' : 'Rejoignez TiPoche gratuitement'}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -104,7 +122,7 @@ export const SignupPage: React.FC = () => {
           </label>
 
           <Button type="submit" variant="primary" fullWidth size="lg" loading={loading} disabled={!form.terms}>
-            Créer mon compte
+            {isPremium ? 'Créer mon compte Premium 👑' : 'Créer mon compte'}
           </Button>
         </form>
 

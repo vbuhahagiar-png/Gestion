@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, CalendarPlus, CheckSquare, PiggyBank, Flame, Users, Activity } from 'lucide-react';
+import { Plus, CalendarPlus, ChevronRight, Users } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useFamilyStore } from '../../store/useFamilyStore';
 import { Avatar } from '../../components/UI/Avatar';
-import { Card } from '../../components/UI/Card';
 import { Button } from '../../components/UI/Button';
 import { ProgressBar } from '../../components/UI/ProgressBar';
 import { Modal } from '../../components/UI/Modal';
@@ -14,7 +13,7 @@ import { useLevel } from '../../hooks/useLevel';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-const ChildCard: React.FC<{ userId: string }> = ({ userId }) => {
+const ChildCard: React.FC<{ userId: string; onView: () => void }> = ({ userId, onView }) => {
   const { allUsers } = useAuthStore();
   const { wallets } = useFamilyStore();
   const user = allUsers.find(u => u.id === userId);
@@ -24,25 +23,30 @@ const ChildCard: React.FC<{ userId: string }> = ({ userId }) => {
   if (!user) return null;
 
   return (
-    <div className="bg-white rounded-3xl p-4 shadow-[0_4px_24px_rgba(0,0,0,0.07)]">
-      <div className="flex items-center gap-3 mb-3">
-        <Avatar emoji={user.avatar} color={user.color} size="md" />
-        <div className="flex-1 min-w-0">
-          <div className="font-bold text-gray-900">{user.name}</div>
-          <div className="text-xs text-gray-500">{currentLevel.emoji} {currentLevel.name}</div>
+    <div className="bg-white rounded-3xl p-4 shadow-[0_4px_24px_rgba(0,0,0,0.07)] flex items-center gap-3">
+      <Avatar emoji={user.avatar} color={user.color} size="md" />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-0.5">
+          <span className="font-bold text-gray-900">{user.name}</span>
+          {user.streak > 0 && (
+            <div className="flex items-center gap-0.5 bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full text-xs font-bold">
+              🔥 {user.streak}
+            </div>
+          )}
         </div>
-        {user.streak > 0 && (
-          <div className="flex items-center gap-1 bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full text-xs font-bold">
-            <Flame className="w-3 h-3" />
-            {user.streak}
-          </div>
-        )}
+        <div className="text-xs text-gray-500 mb-1.5">{currentLevel.emoji} Niv.{currentLevel.level} · {currentLevel.name}</div>
+        <ProgressBar value={progress} animated={false} />
+        <div className="flex items-center gap-3 mt-1.5">
+          <span className="text-xs font-bold text-emerald-600">CHF {wallet?.balance.toFixed(2) || '0.00'}</span>
+          <span className="text-xs text-amber-600 font-semibold">🪙 {user.coins || 0}</span>
+        </div>
       </div>
-      <ProgressBar value={progress} animated={false} />
-      <div className="flex items-center justify-between mt-2">
-        <span className="text-xs text-gray-400">Niv. {currentLevel.level}</span>
-        <span className="text-sm font-bold text-emerald-600">CHF {wallet?.balance.toFixed(2) || '0.00'}</span>
-      </div>
+      <button
+        onClick={onView}
+        className="w-8 h-8 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center hover:bg-purple-200 transition-colors shrink-0"
+      >
+        <ChevronRight className="w-4 h-4" />
+      </button>
     </div>
   );
 };
@@ -90,48 +94,50 @@ export const ParentDashboard: React.FC = () => {
   return (
     <div className="space-y-5">
       {/* Header greeting */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-black text-gray-900">
-            Bonjour {currentUser?.name?.split(' ')[0]} {currentUser?.avatar} 👋
-          </h1>
-          <p className="text-gray-500 text-sm mt-0.5">
-            {format(new Date(), "EEEE d MMMM yyyy", { locale: fr })}
-          </p>
-        </div>
+      <div className="bg-gradient-to-br from-violet-600 to-purple-800 -mx-4 -mt-4 px-4 pt-12 pb-6 text-white mb-0">
+        <p className="text-purple-200 text-sm font-medium">Bonjour 👋</p>
+        <h1 className="text-3xl font-black mt-1">{currentUser?.name?.split(' ')[0]}</h1>
+        <p className="text-purple-200 text-sm mt-1">
+          {pendingTasks.length > 0
+            ? `${pendingTasks.length} tâche${pendingTasks.length > 1 ? 's' : ''} à valider aujourd'hui`
+            : 'Tout est à jour ! 🎉'}
+        </p>
+        <p className="text-purple-300 text-xs mt-1">{format(new Date(), "EEEE d MMMM yyyy", { locale: fr })}</p>
       </div>
 
       {/* Premium banner */}
       {currentFamily && <PremiumBanner plan={currentFamily.plan} />}
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-3 gap-3">
-        <Card
-          gradient="from-amber-400 to-orange-500"
-          className="p-3 text-white cursor-pointer"
+      {/* Summary cards — 2×2 grid */}
+      <div className="grid grid-cols-2 gap-3">
+        <button
           onClick={() => navigate('/parent/tasks')}
+          className="bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl p-4 text-white text-left shadow-lg shadow-amber-200 active:scale-95 transition-transform"
         >
-          <CheckSquare className="w-5 h-5 mb-1 opacity-80" />
-          <div className="text-2xl font-black">{pendingTasks.length}</div>
-          <div className="text-xs opacity-80">À valider</div>
-        </Card>
-        <Card
-          gradient="from-blue-400 to-cyan-500"
-          className="p-3 text-white cursor-pointer"
+          <div className="text-2xl mb-1">🔔</div>
+          <div className="text-3xl font-black">{pendingTasks.length}</div>
+          <div className="text-xs opacity-90 mt-0.5">Tâches à valider</div>
+          <div className="flex justify-end mt-1 opacity-60"><ChevronRight className="w-4 h-4" /></div>
+        </button>
+        <button
           onClick={() => navigate('/parent/children')}
+          className="bg-gradient-to-br from-emerald-400 to-green-600 rounded-3xl p-4 text-white text-left shadow-lg shadow-emerald-200 active:scale-95 transition-transform"
         >
-          <PiggyBank className="w-5 h-5 mb-1 opacity-80" />
-          <div className="text-2xl font-black">{pendingWithdrawals.length}</div>
-          <div className="text-xs opacity-80">Retraits</div>
-        </Card>
-        <Card
-          gradient="from-emerald-400 to-green-500"
-          className="p-3 text-white"
-        >
-          <Activity className="w-5 h-5 mb-1 opacity-80" />
-          <div className="text-2xl font-black">{weekDone.length}</div>
-          <div className="text-xs opacity-80">Cette semaine</div>
-        </Card>
+          <div className="text-2xl mb-1">💰</div>
+          <div className="text-3xl font-black">{pendingWithdrawals.length}</div>
+          <div className="text-xs opacity-90 mt-0.5">Retraits en attente</div>
+          <div className="flex justify-end mt-1 opacity-60"><ChevronRight className="w-4 h-4" /></div>
+        </button>
+        <div className="bg-gradient-to-br from-blue-400 to-cyan-500 rounded-3xl p-4 text-white shadow-lg shadow-blue-200">
+          <div className="text-2xl mb-1">👶</div>
+          <div className="text-3xl font-black">{children.length}</div>
+          <div className="text-xs opacity-90 mt-0.5">Enfants actifs</div>
+        </div>
+        <div className="bg-gradient-to-br from-violet-500 to-purple-600 rounded-3xl p-4 text-white shadow-lg shadow-purple-200">
+          <div className="text-2xl mb-1">🏆</div>
+          <div className="text-3xl font-black">{weekDone.length}</div>
+          <div className="text-xs opacity-90 mt-0.5">Tâches cette semaine</div>
+        </div>
       </div>
 
       {/* Pending tasks */}
@@ -241,7 +247,7 @@ export const ParentDashboard: React.FC = () => {
         </div>
         <div className="grid grid-cols-1 gap-3">
           {children.map(child => (
-            <ChildCard key={child.id} userId={child.id} />
+            <ChildCard key={child.id} userId={child.id} onView={() => navigate('/parent/children')} />
           ))}
         </div>
       </div>
